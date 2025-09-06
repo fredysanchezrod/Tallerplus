@@ -21,6 +21,13 @@ load_dotenv()
 app = Flask(__name__, template_folder="templates")
 CORS(app)
 
+# Habilitar logs
+logging.basicConfig(level=logging.DEBUG)
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.error(f"Error: {e}", exc_info=True)
+    return "Error interno del servidor", 500
+
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///data.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
