@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>TallerPlus - Clientes</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    .error {
+      border: 1px solid red;
+      background-color: #ffe5e5;
+    }
+    .error-msg {
+      color: red;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Clientes - TallerPlus</h1>
+      <button id="logoutBtn" class="btn danger">Cerrar sesión</button>
+    </header>
+
+    <section class="form-section">
+      <h2 id="formTitle">Crear cliente</h2>
+      <form id="clientForm" class="client-form">
+        <div>
+          <label for="nombre">Nombre *</label>
+          <input id="nombre" placeholder="Nombre (obligatorio)" required />
+        </div>
+        <div>
+          <label for="documento">Documento</label>
+          <input id="documento" placeholder="Documento" />
+        </div>
+        <div>
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" placeholder="Teléfono" />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="ejemplo@correo.com" />
+        </div>
+        <div>
+          <label for="direccion">Dirección</label>
+          <input id="direccion" placeholder="Dirección" />
+        </div>
+        <p class="error-msg" id="formError"></p>
+        <div class="form-actions">
+          <button type="submit" id="submitBtn" class="btn primary">Crear</button>
+          <button type="button" id="cancelEditBtn" class="btn secondary" style="display:none;">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="search-section">
+      <input id="search" placeholder="Buscar cliente..." />
+      <button id="doSearch" class="btn primary">Buscar</button>
+    </section>
+
+    <section class="list-section">
+      <h2>Listado de Clientes</h2>
+      <ul id="list" class="client-list"></ul>
+    </section>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("tp_token");
+    if (!token) {
+      alert("No hay sesión activa. Inicia sesión primero.");
+      window.location.href = "/login";
+    }
+
+    let editingId = null;
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("tp_token");
+      window.location.href = "/login";
+    });
+
+    function clearErrors() {
+      document.getElementById("formError").innerText = "";
+      document.querySelectorAll(".error").forEach(el => el.classList.remove("error"));
+    }
+
+    async function loadClients(q = "") {
+      const res = await fetch(`/clients?search=${encodeURIComponent(q)}`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        alert("Error: " + (error.message || res.status));
+        return;
+      }
+      const data = await res.json();
+      const ul = document.getElementById("list");
+      ul.innerHTML = "";
+
+      data.items.forEach(c => {
+        const li = document.createElement("li");
+        li.className = "client-card";
+        li.innerHTML = `
+          <div class="client-info">
+            <strong>ID:</strong> ${c.id}<br>
+            <strong>Nombre:</strong> ${c.nombre || ""}<br>
+            <strong>Documento:</strong> ${c.documento || ""}<br>
+            <strong>Teléfono:</strong> ${c.telefono || ""}<br>
+            <strong>Email:</strong> ${c.email || ""}<br>
+            <strong>Dirección:</strong> ${c.direccion || ""}
+          </div>
+          <div class="card-actions">
+            <button class="btn secondary" onclick="startEdit(${c.id}, '${encodeURIComponent(c.nombre || "")}', '${encodeURIComponent(c.documento || "")}', '${encodeURIComponent(c.telefono || "")}', '${encodeURIComponent(c.email || "")}', '${encodeURIComponent(c.direccion || "")}')">Actualizar</button>
+            <button class="btn danger" onclick="deleteClient(${c.id})">Eliminar</button>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    async function deleteClient(id) {
+      if (!confirm("¿Seguro que deseas eliminar este cliente?")) return;
+
+      const res = await fetch(`/clients/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": "Bearer " + token }
+      });
+
+      if (res.ok) {
+        alert("Cliente eliminado correctamente");
+        loadClients();
+      } else {
+        const err = await res.json();
+        alert("Error al eliminar: " + JSON.stringify(err));
+      }
+    }
+
+    function startEdit(id, nombre, documento, telefono, email, direccion) {
+      editingId = id;
+      document.getElementById("nombre").value = decodeURIComponent(nombre);
+      document.getElementById("documento").value = decodeURIComponent(documento);
+      document.getElementById("telefono").value = decodeURIComponent(telefono);
+      document.getElementById("email").value = decodeURIComponent(email);
+      document.getElementById("direccion").value = decodeURIComponent(direccion);
+      document.getElementById("submitBtn").textContent = "Guardar Cambios";
+      document.getElementById("formTitle").textContent = "Editar cliente";
+      document.getElementById("cancelEditBtn").style.display = "inline-block";
+    }
+
+    function resetForm() {
+      editingId = null;
+      document.getElementById("clientForm").reset();
+      document.getElementById("submitBtn").textContent = "Crear";
+      document.getElementById("formTitle").textContent = "Crear cliente";
+      document.getElementById("cancelEditBtn").style.display = "none";
+      clearErrors();
+    }
+
+    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
+
+    document.getElementById("clientForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearErrors();
+
+      const nombre = document.getElementById("nombre");
+      const documento = document.getElementById("documento");
+      const telefono = document.getElementById("telefono");
+      const email = document.getElementById("email");
+
+      let hasError = false;
+      if (!nombre.value.trim()) {
+        nombre.classList.add("error");
+        document.getElementById("formError").innerText = "El nombre es obligatorio.";
+        hasError = true;
+      }
+      if (!documento.value.trim() && !telefono.value.trim()) {
+        documento.classList.add("error");
+        telefono.classList.add("error");
+        document.getElementById("formError").innerText = "Debe ingresar al menos Documento o Teléfono.";
+        hasError = true;
+      }
+      if (email.value && !email.checkValidity()) {
+        email.classList.add("error");
+        document.getElementById("formError").innerText = "El correo no es válido.";
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      const body = {
+        nombre: nombre.value.trim(),
+        documento: documento.value.trim(),
+        telefono: telefono.value.trim(),
+        email: email.value.trim(),
+        direccion: document.getElementById("direccion").value.trim()
+      };
+
+      let url = "/clients";
+      let method = "POST";
+      if (editingId) {
+        url = `/clients/${editingId}`;
+        method = "PUT";
+      }
+
+      const res = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        alert(editingId ? "Cliente actualizado" : "Cliente creado");
+        resetForm();
+        loadClients();
+      } else {
+        const err = await res.json();
+        document.getElementById("formError").innerText = err.message || "Error al guardar cliente";
+      }
+    });
+
+    document.getElementById("doSearch").addEventListener("click", () => {
+      loadClients(document.getElementById("search").value);
+    });
+
+    loadClients();
+  </script>
+</body>
+</html>

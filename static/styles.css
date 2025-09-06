@@ -1,0 +1,254 @@
+/* === General === */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9fafc;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* === Header === */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #3f72af;
+  padding: 15px 20px;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+/* === Buttons === */
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s ease;
+  font-size: 0.95em;
+}
+
+.btn.primary {
+  background: #3f72af;
+  color: #fff;
+}
+
+.btn.primary:hover {
+  background: #2c528b;
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background: #ffb703;
+  color: #fff;
+}
+
+.btn.secondary:hover {
+  background: #e09b00;
+  transform: translateY(-1px);
+}
+
+.btn.danger {
+  background: #d00000;
+  color: #fff;
+}
+
+.btn.danger:hover {
+  background: #a00000;
+  transform: translateY(-1px);
+}
+
+/* === Form Section === */
+.form-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.client-form div {
+  margin-bottom: 12px;
+}
+
+.client-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.client-form label::after {
+  content: " *";
+  color: red;
+  font-weight: bold;
+  visibility: hidden;
+}
+
+.client-form input[required] + label::after,
+.client-form label[for="nombre"]::after {
+  visibility: visible;
+}
+
+.client-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.client-form input:focus {
+  border-color: #3f72af;
+  outline: none;
+  box-shadow: 0 0 5px rgba(63, 114, 175, 0.3);
+}
+
+.error {
+  border-color: red !important;
+  background-color: #ffe5e5 !important;
+}
+
+.error-msg {
+  color: red;
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/* === Form Actions === */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* === Search Section === */
+.search-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-section input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+}
+
+/* === Client List === */
+.client-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+  padding: 0;
+  list-style: none;
+}
+
+.client-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.client-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* === Login Page === */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #3f72af, #f9fafc);
+  padding: 20px;
+}
+
+.login-card {
+  background: #fff;
+  padding: 30px 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-title {
+  font-size: 2em;
+  color: #3f72af;
+  margin-bottom: 10px;
+}
+
+.login-subtitle {
+  font-size: 1.2em;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.login-form label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+}
+
+.btn.full {
+  width: 100%;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  .search-section {
+    flex-direction: column;
+  }
+  header {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
