@@ -4,6 +4,6 @@ __pycache__/
 data.db
 .env
 .DS_Store
-.idea/
 .vscode/
+.idea/
 *.log
